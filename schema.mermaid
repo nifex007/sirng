@@ -1,0 +1,193 @@
+erDiagram
+    USERS ||--o{ USER_ROLES : assigned
+    ROLES ||--o{ USER_ROLES : contains
+    ROLES ||--o{ ROLE_PERMISSIONS : grants
+    PERMISSIONS ||--o{ ROLE_PERMISSIONS : defined_as
+    
+    USERS ||--o{ INCIDENTS : submits
+    USERS ||--o{ MODERATION_HISTORY : reviews
+    
+    INCIDENTS ||--o{ INCIDENT_IDENTIFIERS : contains
+    INCIDENTS ||--o{ EVIDENCE : has
+    INCIDENTS ||--o{ ALLEGED_PARTIES : involves
+    
+    IDENTIFIER_MASTER ||--o{ INCIDENT_IDENTIFIERS : referenced_by
+    IDENTIFIER_MASTER ||--o| IDENTIFIER_SUMMARY : aggregated
+    
+    API_CLIENTS ||--o{ SEARCH_LOGS : performs
+    
+    MODERATION_HISTORY }o--|| INCIDENTS : moderates
+    ALLEGED_PARTIES }o--o{ IDENTIFIER_MASTER : identified_by
+    EVIDENCE }o--o{ MODERATION_HISTORY : reviewed_in
+    
+    USERS {
+        UUID id PK
+        TEXT full_name
+        TEXT email UK
+        TEXT phone_number
+        TEXT password_hash
+        BOOLEAN is_active
+        BOOLEAN email_verified
+        TIMESTAMP created_at
+        TIMESTAMP updated_at
+        UUID created_by FK
+        UUID updated_by FK
+    }
+    
+    ROLES {
+        UUID id PK
+        TEXT name UK
+        TEXT description
+        TIMESTAMP created_at
+        TIMESTAMP updated_at
+        UUID created_by FK
+    }
+    
+    USER_ROLES {
+        UUID user_id PK, FK
+        UUID role_id PK, FK
+        TIMESTAMP assigned_at
+        UUID assigned_by FK
+    }
+    
+    PERMISSIONS {
+        UUID id PK
+        TEXT name UK
+        TEXT description
+        TIMESTAMP created_at
+        TIMESTAMP updated_at
+    }
+    
+    ROLE_PERMISSIONS {
+        UUID role_id PK, FK
+        UUID permission_id PK, FK
+        TIMESTAMP granted_at
+        UUID granted_by FK
+    }
+    
+    INCIDENTS {
+        UUID id PK
+        UUID reporter_id FK
+        TEXT incident_title
+        TEXT incident_description
+        TEXT incident_status
+        TEXT visibility
+        DECIMAL total_amount_lost
+        TEXT currency
+        DATE incident_date
+        BOOLEAN is_deleted
+        TIMESTAMP created_at
+        TIMESTAMP updated_at
+        UUID created_by FK
+        UUID updated_by FK
+        UUID deleted_by FK
+        TIMESTAMP deleted_at
+    }
+    
+    ALLEGED_PARTIES {
+        UUID id PK
+        UUID incident_id FK
+        TEXT display_name
+        TEXT alias
+        TEXT notes
+        TIMESTAMP created_at
+        TIMESTAMP updated_at
+        UUID created_by FK
+    }
+    
+    ALLEGED_PARTY_IDENTIFIERS {
+        UUID alleged_party_id PK, FK
+        UUID identifier_id PK, FK
+        TEXT relationship_type
+        TIMESTAMP associated_at
+    }
+    
+    IDENTIFIER_MASTER {
+        UUID id PK
+        TEXT identifier_type
+        TEXT normalized_value
+        TEXT country
+        BOOLEAN is_deleted
+        TIMESTAMP created_at
+        TIMESTAMP updated_at
+        UUID created_by FK
+        UUID deleted_by FK
+        TIMESTAMP deleted_at
+    }
+    
+    INCIDENT_IDENTIFIERS {
+        UUID id PK
+        UUID incident_id FK
+        UUID identifier_id FK
+        TEXT raw_value
+        JSONB metadata
+        TIMESTAMP created_at
+        UUID created_by FK
+    }
+    
+    IDENTIFIER_SUMMARY {
+        UUID identifier_id PK, FK
+        INTEGER approved_incident_count
+        DECIMAL total_reported_loss
+        TIMESTAMP last_reported_at
+        TIMESTAMP calculated_at
+        INTEGER incident_count_30d
+        DECIMAL loss_amount_30d
+    }
+    
+    EVIDENCE {
+        UUID id PK
+        UUID incident_id FK
+        TEXT file_url
+        TEXT file_hash
+        TEXT file_type
+        TEXT description
+        TIMESTAMP uploaded_at
+        UUID uploaded_by FK
+        TEXT moderation_status
+    }
+    
+    MODERATION_HISTORY {
+        UUID id PK
+        UUID incident_id FK
+        UUID reviewer_id FK
+        TEXT decision
+        TEXT reason
+        TIMESTAMP reviewed_at
+        UUID evidence_id FK
+        JSONB evidence_review_notes
+        INTEGER version
+        UUID superseded_by FK
+    }
+    
+    API_CLIENTS {
+        UUID id PK
+        TEXT organisation_name
+        TEXT api_key_hash
+        TEXT api_key_salt
+        BOOLEAN is_active
+        INTEGER rate_limit
+        TIMESTAMP created_at
+        TIMESTAMP last_used_at
+        TIMESTAMP key_expires_at
+        UUID created_by FK
+    }
+    
+    SEARCH_LOGS {
+        UUID id PK
+        UUID api_client_id FK
+        TEXT identifier_type
+        TEXT searched_value
+        TEXT ip_address
+        TIMESTAMP created_at
+        TEXT user_agent
+        INTEGER results_count
+        INTEGER response_time_ms
+    }
+    
+    DATA_RETENTION_POLICY {
+        TEXT table_name PK
+        INTEGER retention_days
+        TEXT archive_strategy
+        TIMESTAMP last_archived_at
+    }
