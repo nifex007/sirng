@@ -1,0 +1,35 @@
+openapi: 3.0.3
+info:
+  title: Scam Incident Registry API
+  version: 0.1.0
+paths:
+  /api/health:
+    get:
+      operationId: getHealth
+      summary: Check API health
+      responses:
+        '200':
+          description: API is running
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                  - status
+                properties:
+                  status:
+                    type: string
+                    enum: [ok]
+        '405':
+          description: Method not allowed
+          headers:
+            Allow:
+              schema:
+                type: string
+              example: GET, HEAD
+    head:
+      operationId: headHealth
+      summary: Check API health without a response body
+      responses:
+        '200':
+          description: API is running

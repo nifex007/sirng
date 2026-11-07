@@ -1,0 +1,17 @@
+# Build and test output
+/bin/
+/tmp/
+*.test
+coverage.out
+coverage.html
+
+# Local environment configuration
+.env
+.env.*
+!.env.example
+
+# Local logs
+*.log
+
+# macOS metadata
+.DS_Store

@@ -1,0 +1,18 @@
+# Dependencies and build output
+/node_modules/
+/dist/
+/dist-ssr/
+/coverage/
+/.vite/
+*.tsbuildinfo
+
+# Local environment configuration
+.env
+.env.*
+!.env.example
+
+# Local logs
+*.log
+
+# macOS metadata
+.DS_Store

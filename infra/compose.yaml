@@ -1,0 +1,40 @@
+name: sirng-infra
+services:
+  postgres:
+    image: postgres:17
+    environment:
+      POSTGRES_DB: sirng
+      POSTGRES_USER: sirng
+      POSTGRES_PASSWORD: sirng
+    ports:
+      - '127.0.0.1:5432:5432'
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+    healthcheck:
+      test: ['CMD-SHELL', 'pg_isready -U sirng -d sirng']
+      interval: 5s
+      timeout: 5s
+      retries: 20
+  localstack:
+    image: localstack/localstack-pro:latest
+    environment:
+      LOCALSTACK_AUTH_TOKEN: ${LOCALSTACK_AUTH_TOKEN:?Set LOCALSTACK_AUTH_TOKEN for LocalStack with persistence}
+      SERVICES: s3
+      PERSISTENCE: '1'
+      AWS_DEFAULT_REGION: us-east-1
+      AWS_ACCESS_KEY_ID: test
+      AWS_SECRET_ACCESS_KEY: test
+    ports:
+      - '127.0.0.1:4566:4566'
+    volumes:
+      - localstack-data:/var/lib/localstack
+      - ./localstack/init-s3.sh:/etc/localstack/init/ready.d/init-s3.sh:ro
+    healthcheck:
+      test: ['CMD', 'awslocal', 's3api', 'head-bucket', '--bucket', 'sirng-evidence']
+      interval: 5s
+      timeout: 5s
+      retries: 30
+      start_period: 20s
+volumes:
+  postgres-data:
+  localstack-data:
